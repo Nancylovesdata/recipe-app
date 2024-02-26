@@ -1,22 +1,39 @@
 import { Container, CardMedia, TextField, Grid, Card, CardContent, Typography } from "@mui/material";
+import RecipeItem from "../../components/recipe-item";
+import { useEffect, useState } from "react"
+
 export default function Recipes() {
+    // the recipes in the const array is to fetch the recipes, and the setRecipes is to update the Recipes
+    const [recipes, setRecipes] = useState([]);
+
+    const searchRecipes = () => {
+        //prepare url
+        const url = new URL('https://api.spoonacular.com/recipes/complexSearch');
+        url.searchParams.append('apiKey', '4b01be90c2fb45019bbf5b209d3be976')
+
+        // fetch recipes
+        fetch(url)
+            .then((response) => response.json())
+            .then((data) => {
+                //update the recipes state
+                setRecipes(data.results);
+                // console.log(data);
+            })
+            .catch((error) => {
+                console.log(error);
+            })
+    }
+//empty square bracket means run once
+    useEffect(searchRecipes,[]);
+
     return (
-        <Container sx={{ my: '2rem' }} maxWidth="sm">
+        <Container sx={{ my: '2rem' }} >
             <TextField
                 fullWidth="outlined-basic"
                 label="Enter a keyword to search recipes and hit Enter"
                 variant="outlined" />
-            <Grid container spacing={3}>
-                <Grid sx={{mt:"1rem"}} item xs={4}>
-                    <Card>
-                        <CardMedia sx={{ height: 140 }} image="https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8aGFtYnVyZ2VyfGVufDB8fDB8fHww" />
-                    </Card>
-                    <CardContent>
-                        <Typography variant="h5">
-                            HAMBURGER
-                        </Typography>
-                    </CardContent>
-                </Grid>
+            <Grid sx={{ mt: '1rem' }} container spacing={3}>
+                {recipes.map((recipe) => <RecipeItem key={recipe.id} title={recipe.title} image={recipe.image} />)}
             </Grid>
 
         </Container>
